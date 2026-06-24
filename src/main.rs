@@ -1,5 +1,7 @@
 use arboard::Clipboard;
 use std::io;
+use std::thread;
+use std::time::Duration;
 
 const READING_THE_SIGNS: bool = true;
 const DC_BY_LVL: [u8; 10] = [15, 16, 18, 19, 20, 22, 23, 24, 26, 27];
@@ -97,22 +99,27 @@ fn get_suit(name: &str) -> String {
     let roll1 = suit_to_string(roll1);
     let roll2 = suit_to_string(roll2);
     println!("{name} card: {roll1} (1) or {roll2} (2)?");
+
     let mut choice: String = String::new();
     io::stdin()
         .read_line(&mut choice)
         .expect("Failed to read line");
-    let choice: u8 = choice
-        .trim()
-        .parse()
-        .expect("The skill bonus must be a number.");
+    let choice: u8 = choice.trim().parse().expect("The choice must be a number.");
+    if choice != 1 || choice != 2 {
+        panic!("The choice must be 1 or 2");
+    }
 
-    if choice == 1 {
-        return roll1;
+    match choice {
+        1 => {
+            return roll1;
+        }
+        2 => {
+            return roll1;
+        }
+        _ => {
+            panic!("The choice must be either 1 or 2");
+        }
     }
-    if choice == 2 {
-        return roll2;
-    }
-    return "ERROR IN GET_SUIT".to_string();
 }
 
 fn suit_to_string(suit: u8) -> String {
@@ -132,14 +139,35 @@ fn roll(size: u8) -> u8 {
     return rand::random_range(1..=size);
 }
 
+// Copies the data to clipboard imitating the format of FoundryTTV journals
 fn copy_table(table: Vec<(&str, String, String)>) {
     let mut clipboard = Clipboard::new().unwrap();
-    let mut aux: String = String::new();
-    for elem in table {
-        aux += &format!("{}\n\n{}\n\n{}\n\n-\n\n\n", elem.0, elem.1, elem.2);
-    }
 
-    let clipboard_text: String =
-        "Characters\n\nGrade of Success\n\nPossible Check\n\nUsed\n\n\n".to_string() + aux.as_str();
-    clipboard.set_text(clipboard_text).unwrap();
+    let mut text: String = String::new();
+    for elem in table.clone() {
+        text += &format!("{}\n\n{}\n\n{}\n\n-\n\n\n", elem.0, elem.1, elem.2);
+    }
+    text = format!(
+        "Characters\n\nGrade of Success\n\nPossible Check\n\nUsed\n\n\n{}",
+        text
+    );
+
+    let mut html: String = String::new();
+    for elem in table {
+        html += &format!(
+            "<tr><td><p>{}</p></td><td><p>{}</p></td><td><p>{}</p></td><td><p></p></td></tr>",
+            elem.0, elem.1, elem.2
+        );
+    }
+    html = format!(
+        "<table data-pm-slice=\"1 1 []\"><tbody><tr><th><p>Characters</p></th><th><p>Grade of Success</p></th><th><p>Possible Check</p></th><th><p>Used</p></th></tr>{}</tbody></table>",
+        html
+    );
+
+    clipboard
+        .set_html(html, Some(text))
+        .expect("Copying to clipboard failed!");
+
+    // At least on wayland I need sleep for it to work, not sure why
+    thread::sleep(Duration::from_millis(100));
 }
