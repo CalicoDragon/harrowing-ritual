@@ -4,7 +4,7 @@ use std::thread;
 use std::time::Duration;
 
 const READING_THE_SIGNS: bool = true;
-const DC_BY_LVL: [u8; 10] = [15, 16, 18, 19, 20, 22, 23, 24, 26, 27];
+const DC_BY_LVL: [u8; 10] = [16, 19, 22, 24, 27, 30, 32, 35, 38, 40];
 
 fn main() {
     // Inizialization and Inputs
