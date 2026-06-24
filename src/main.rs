@@ -144,21 +144,20 @@ fn copy_table(table: Vec<(&str, String, String)>) {
     let mut clipboard = Clipboard::new().unwrap();
 
     let mut text: String = String::new();
-    for elem in table.clone() {
-        text += &format!("{}\n\n{}\n\n{}\n\n-\n\n\n", elem.0, elem.1, elem.2);
-    }
-    text = format!(
-        "Characters\n\nGrade of Success\n\nPossible Check\n\nUsed\n\n\n{}",
-        text
-    );
-
     let mut html: String = String::new();
     for elem in table {
+        text += &format!("{}\n\n{}\n\n{}\n\n-\n\n\n", elem.0, elem.1, elem.2);
         html += &format!(
             "<tr><td><p>{}</p></td><td><p>{}</p></td><td><p>{}</p></td><td><p></p></td></tr>",
             elem.0, elem.1, elem.2
         );
     }
+
+    text = format!(
+        "Characters\n\nGrade of Success\n\nPossible Check\n\nUsed\n\n\n{}",
+        text
+    );
+
     html = format!(
         "<table data-pm-slice=\"1 1 []\"><tbody><tr><th><p>Characters</p></th><th><p>Grade of Success</p></th><th><p>Possible Check</p></th><th><p>Used</p></th></tr>{}</tbody></table>",
         html
