@@ -105,7 +105,7 @@ fn get_suit(name: &str) -> String {
         .read_line(&mut choice)
         .expect("Failed to read line");
     let choice: u8 = choice.trim().parse().expect("The choice must be a number.");
-    if choice != 1 || choice != 2 {
+    if choice != 1 && choice != 2 {
         panic!("The choice must be 1 or 2");
     }
 
@@ -114,7 +114,7 @@ fn get_suit(name: &str) -> String {
             return roll1;
         }
         2 => {
-            return roll1;
+            return roll2;
         }
         _ => {
             panic!("The choice must be either 1 or 2");
